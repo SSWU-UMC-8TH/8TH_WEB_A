@@ -1,10 +1,20 @@
-interface TodoFormProps {
-  input: string;
-  setInput: (input: string) => void;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+import { FormEvent, useState } from "react";
+import { useTodo } from "../context/TodoContext";
 
-const TodoForm = ({ input, setInput, handleSubmit }: TodoFormProps) => {
+const TodoForm = () => {
+  const [input, setInput] = useState<string>('');
+  const { addTodo } = useTodo();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); //버튼 클릭 시 새로고침 방지
+    console.log('동작함')
+    const text = input.trim(); //공백 자름
+  
+    if (text) {
+      addTodo(text);
+      setInput('');
+    }
+  };
   return (
     <form onSubmit={handleSubmit} className="todo-container__form">
       <input
