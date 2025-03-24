@@ -1,5 +1,6 @@
 import './App.css'
-import Todo from './components/Todo.tsx';
+import TodoBefore from './components/TodoBefore.tsx';
+import Todo from './components/Todo.tsx'
 
 function App() {
   return (
