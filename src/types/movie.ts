@@ -1,7 +1,7 @@
-export type Movie = {
+// 겹치는 타입을 BaseMovie로 분리
+export type BaseMovie = {
   adult: boolean;
   backdrop_path: string;
-  genre_ids: number[];
   id: number;
   original_language: string;
   original_title: string;
@@ -15,6 +15,10 @@ export type Movie = {
   vote_count: number;
 }
 
+export type Movie = BaseMovie & {
+  genre_ids: number[];
+}
+
 export type MovieResponse = {
   page: number;
   results: Movie[];
@@ -22,23 +26,31 @@ export type MovieResponse = {
   total_results: number;
 }
 
-export type MovieDetail = {
-  adult: boolean;
-  backdrop_path: string;
-  belongs_to_collection: null | string;
-  budget: number;
-  genres: {
-    id: number;
+type Genre = {
+  id: number
+  name: string;
+}
+
+type SpokenLanguages = {
+  english_name: string;
+    iso_639_1: string;
     name: string;
-  }[];
-  homepage: string;
-  id: number;          
-  imdb_id: string;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
+}
+
+type BelongsToCollection = {
+  id: number;
+  name: string;
   poster_path: string;
+  backdrop_path: string;
+}
+
+export type MovieDetail = BaseMovie & {
+  belongs_to_collection: BelongsToCollection;
+  budget: number;
+  genres: Genre[];
+  homepage: string;       
+  imdb_id: string;
+  origin_country: string[];
   production_companies: {
     id: number;
     logo_path: string;
@@ -49,18 +61,9 @@ export type MovieDetail = {
     iso_3166_1: string;
     name: string;
   }[];
-  release_date: string;
   revenue: number;
   runtime: number;
-  spoken_languages: {
-    english_name: string;
-    iso_639_1: string;
-    name: string;
-  }[];
+  spoken_languages: SpokenLanguages[];
   status: string;
   tagline: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
 }

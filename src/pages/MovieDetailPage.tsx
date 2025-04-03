@@ -1,61 +1,17 @@
 import { useParams } from "react-router-dom"
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { MovieDetail } from "../types/movie";
 import { LoadingSpinner } from "../components/LoadingSpinner";
+import useCustomFetch from "../hooks/useCustomFetch";
 
 export const MovieDetailPage = () => {
-
   const { movieId } = useParams<{ movieId: string }>();
-  const [movie, setMovie] = useState<MovieDetail | null>(null);
-  const [credits, setCredits] = useState<{ cast: any[]; crew: any[] } | null>(null);
-  // 1. 로딩 상태
-  const [isPending, setIsPending] = useState(false);
-  // 2. 에러 상태
-  const [isError, setIsError] = useState(false);
+  
+  const url=`https://api.themoviedb.org/3/movie/${movieId}?language=ko-kr`
 
-    console.log(movie);
-  useEffect(() => {
-    const fetchMovieDetail = async () => {
-      setIsPending(true);
+  const { data: movie, isPending, isError } = useCustomFetch<MovieDetail>(url, "ko-KR");
+  const creditsUrl = `https://api.themoviedb.org/3/movie/${movieId}/credits?language=ko-KR`;
 
-      try {
-        const { data } = await axios.get<MovieDetail>(
-          `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`
-            },
-          }
-        )
-        setMovie(data);
-      } catch {
-        setIsError(true);
-      } finally { 
-        setIsPending(false);
-      }
-    };
-
-    const fetchMovieCredits = async () => {
-      try {
-        const { data } = await axios.get(
-          `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=VITE_TMDB_KEY&language=ko-KR`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`
-            },
-          }
-        )
-        setCredits(data);
-      } catch (error) {
-        setIsError(true);
-      } finally {
-        setIsPending(false);
-      }
-    };
-    fetchMovieCredits();
-    fetchMovieDetail();
-  }, [movieId]);
+  const { data: credits, isPending: isCreditsPending, isError: isCreditsError } = useCustomFetch<{ cast: any[], crew: any[] }>(creditsUrl, "ko-KR");
 
   if (isError) {
     return (
@@ -71,7 +27,6 @@ export const MovieDetailPage = () => {
   const topCast = credits?.cast.slice(0, 5);
 
   return (
-    
     <div className="bg-black text-white min-h-screen p-6 flex justify-center items-center">
       {isPending && (
               <div className="flex justify-center items-center h-dvh">
