@@ -5,6 +5,8 @@ import Popular from '../pages/movies/Popular';
 import Upcoming from '../pages/movies/Upcoming';
 import TopRated from '../pages/movies/TopRated';
 import NowPlaying from '../pages/movies/NowPlaying';
+import MovieDetail from '../pages/movies/MovieDetail';
+
 
 export const router = createBrowserRouter([
   {
@@ -16,6 +18,8 @@ export const router = createBrowserRouter([
       { path: 'movies/upcoming', element: <Upcoming /> },
       { path: 'movies/top-rated', element: <TopRated /> },
       { path: 'movies/now_playing', element: <NowPlaying /> },
+      { path: 'movies/:movieId', element: <MovieDetail />}
+      
     ],
   },
 ]);
