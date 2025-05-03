@@ -56,8 +56,11 @@ export const LoginPage = () => {
       alert("이메일 또는 비밀번호가 올바르지 않습니다.");
     }
   };
-  
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_SERVER_API_URL}/v1/auth/google/login`;
+  };
+  
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <div className="relative w-[300px] flex items-center justify-center h-12">
@@ -107,6 +110,18 @@ export const LoginPage = () => {
           로그인
         </button>
       </form>
+      <div className="w-[300px] mt-3">
+    <button
+      type="button"
+      onClick={handleGoogleLogin}
+      className="w-full bg-white text-gray-700 border border-gray-300 py-3 rounded-md text-lg font-medium hover:bg-gray-100 transition-colors cursor-pointer"
+    >
+      <div className="flex items-center justify-center gap-2">
+        <img src="./../assets/ic_google.png" alt="Google 아이콘" className="w-5 h-5" />
+        <span>Google로 로그인</span>
+      </div>
+    </button>
+  </div>
     </div>
   );
 };
