@@ -1,5 +1,4 @@
-// Signup.tsx
-// 회원가입 페이지
+// src/pages/Signup.tsx
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,7 +28,11 @@ export default function Signup() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswords, setShowPasswords] = useState({
+    password: false,
+    confirm: false,
+  });
+
   const navigate = useNavigate();
 
   const {
@@ -52,12 +55,12 @@ export default function Signup() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-black text-white relative">
-      {/* 왼쪽 상단: 뒤로가기 */}
+      {/* 뒤로가기 */}
       <button className="absolute top-4 left-4" onClick={() => navigate(-1)}>
         &lt;
       </button>
 
-      {/* 오른쪽 상단: 로그인 이동 */}
+      {/* 로그인 이동 */}
       <div className="absolute top-4 right-4">
         <Link
           to="/login"
@@ -69,6 +72,7 @@ export default function Signup() {
 
       <h1 className="text-2xl font-bold mb-6">회원가입</h1>
 
+      {/* 1단계: 이메일 */}
       {step === 1 && (
         <form
           onSubmit={handleEmailSubmit((data) => {
@@ -97,6 +101,7 @@ export default function Signup() {
         </form>
       )}
 
+      {/* 2단계: 비밀번호 */}
       {step === 2 && (
         <form
           onSubmit={handlePasswordSubmit((data) => {
@@ -106,9 +111,11 @@ export default function Signup() {
           className="w-80 flex flex-col gap-4"
         >
           <p className="text-left mb-1">📧 {email}</p>
+
+          {/* 비밀번호 */}
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPasswords.password ? 'text' : 'password'}
               placeholder="비밀번호를 입력해주세요!"
               className="p-3 rounded w-full text-black bg-zinc-100"
               {...registerPassword('password')}
@@ -116,8 +123,13 @@ export default function Signup() {
             />
             <button
               type="button"
-              className="absolute right-3 top-3"
-              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 text-gray-600"
+              onClick={() =>
+                setShowPasswords((prev) => ({
+                  ...prev,
+                  password: !prev.password,
+                }))
+              }
             >
               👁️
             </button>
@@ -126,13 +138,28 @@ export default function Signup() {
             <p className="text-red-400 text-sm">{passwordErrors.password.message}</p>
           )}
 
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="비밀번호를 다시 한 번 입력해주세요!"
-            className="p-3 rounded text-black bg-zinc-100"
-            {...registerPassword('confirmPassword')}
-            autoComplete="new-password"
-          />
+          {/* 비밀번호 확인 */}
+          <div className="relative">
+            <input
+              type={showPasswords.confirm ? 'text' : 'password'}
+              placeholder="비밀번호를 다시 한 번 입력해주세요!"
+              className="p-3 rounded w-full text-black bg-zinc-100"
+              {...registerPassword('confirmPassword')}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-3 text-gray-600"
+              onClick={() =>
+                setShowPasswords((prev) => ({
+                  ...prev,
+                  confirm: !prev.confirm,
+                }))
+              }
+            >
+              👁️
+            </button>
+          </div>
           {passwordErrors.confirmPassword && (
             <p className="text-red-400 text-sm">{passwordErrors.confirmPassword.message}</p>
           )}
@@ -147,6 +174,7 @@ export default function Signup() {
         </form>
       )}
 
+      {/* 3단계: 이름 */}
       {step === 3 && (
         <form
           onSubmit={handleNameSubmit(async (data) => {
@@ -154,10 +182,9 @@ export default function Signup() {
               email,
               password,
               name: data.name,
-              bio: '자기소개 없음', // 선택적으로 빈 문자열 또는 기본값
-              avatar: 'https://avatars.githubusercontent.com/u/1?v=4', 
+              bio: '자기소개 없음',
+              avatar: '/default-avatar.png', // ✅ 기본값으로 변경
             };
-            
 
             console.log('회원가입 요청 바디:', signupData);
 
@@ -176,7 +203,7 @@ export default function Signup() {
           className="w-80 flex flex-col gap-4 items-center"
         >
           <img
-            src="/avatar-placeholder.png"
+            src="/default-avatar.png"
             alt="avatar"
             className="w-20 h-20 rounded-full mb-2"
           />

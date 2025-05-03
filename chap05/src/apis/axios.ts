@@ -1,42 +1,65 @@
-import axios, { AxiosInstance } from 'axios';
+// src/apis/axios.ts
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import {
+  getLocalStorage,
+  setLocalStorage,
+  removeLocalStorage,
+} from '../utils/localStorage';
 import { LOCAL_STORAGE_KEY } from '../constants/key';
-import { getLocalStorage } from '../utils/localStorage';
 
-export const axiosInstance: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
-  headers: {
-    'Content-Type': 'application/json', 
-    Accept: 'application/json',        
-  },
+interface RetryConfig extends InternalAxiosRequestConfig { _retry?: boolean }
+interface ApiResponse<T> { statusCode: number; message: string; data: T }
+
+export const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_SERVER_API_URL ?? 'http://localhost:8000/v1',
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    let token: string | null = null;
-
-    try {
-      token = getLocalStorage(LOCAL_STORAGE_KEY.accessToken);
-    } catch (e) {
-      console.error(`❌ 로컬스토리지에서 accessToken 불러오기 실패:`, e);
-    }
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    console.log('[요청 URL]', `${config.baseURL ?? ''}${config.url ?? ''}`);
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// 요청마다 AccessToken 헤더
+axiosInstance.interceptors.request.use((config) => {
+  const token = getLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// ✅ 응답 인터셉터: 에러 콘솔 출력
+// 401 → 자동 리프레시
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error);
-    return Promise.reject(error);
+  (res) => res,
+  async (err: AxiosError) => {
+    const original = err.config as RetryConfig;
+    if (err.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      // 리프레시 자체가 401이면 강제 로그아웃
+      if (original.url?.endsWith('/auth/refresh')) {
+        removeLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+        removeLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+        window.location.href = '/login';
+        return Promise.reject(err);
+      }
+      try {
+        // raw refreshToken 꺼내서 그대로 body에!
+        const refreshToken = getLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+        const { data: { data } } = await axiosInstance.post<ApiResponse<{ accessToken: string; refreshToken: string }>>(
+          '/auth/refresh',
+          { refresh_token: refreshToken }  // 👈 서버가 snake_case를 기대한다면 이렇게
+        );
+        const { accessToken, refreshToken: newRefresh } = data;
+        setLocalStorage(LOCAL_STORAGE_KEY.accessToken, accessToken);
+        setLocalStorage(LOCAL_STORAGE_KEY.refreshToken, newRefresh);
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return axiosInstance(original);
+      } catch (refreshErr) {
+        removeLocalStorage(LOCAL_STORAGE_KEY.accessToken);
+        removeLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
+        window.location.href = '/login';
+        return Promise.reject(refreshErr);
+      }
+    }
+    return Promise.reject(err);
   }
 );

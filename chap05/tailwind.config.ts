@@ -8,7 +8,7 @@ const config: Config = {
   theme: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/line-clamp')],
+  plugins: [(await import('@tailwindcss/line-clamp')).default],
 };
 
 export default config;

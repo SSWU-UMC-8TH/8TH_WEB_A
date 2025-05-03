@@ -1,45 +1,48 @@
+// src/pages/MoviePage.tsx
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { tmdbInstance } from '../apis/axios';
 import { Movie, MovieResponse } from '../types/movie';
 import MovieCard from '../components/MovieCard';
+import { useParams } from 'react-router-dom';
 
-interface MoviePageProps {
-  category: string;
-}
-
-export default function MoviePage({ category }: MoviePageProps) {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [page, setPage] = useState(1); 
+export default function MoviePage() {
+  const { category } = useParams<{ category: string }>();
+  const [movies, setMovies]   = useState<Movie[]>([]);
+  const [page, setPage]       = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
+
+  // 카테고리 바뀔 때마다 페이지를 1로 리셋
+  useEffect(() => {
+    setPage(1);
+  }, [category]);
 
   useEffect(() => {
-    const fetchMovies = async (): Promise<void> => {
+    if (!category) return;
+
+    const fetchMovies = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.get<MovieResponse>(
-          `https://api.themoviedb.org/3/movie/${category}?language=ko-KR&page=${page}`,
-          {
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_TMDB_KEY}`,
-            },
-          }
+        const { data } = await tmdbInstance.get<MovieResponse>(
+          `/movie/${category}`,
+          { params: { language: 'ko-KR', page } }
         );
         setMovies(data.results);
-        setLoading(false);
       } catch (err) {
+        console.error(err);
         setError('죄송합니다. 영화 데이터를 불러오는 데 실패했습니다.');
+      } finally {
         setLoading(false);
       }
     };
 
     fetchMovies();
-  }, [category, page]); 
+  }, [category, page]);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-60">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent" />
       </div>
     );
   }
@@ -54,18 +57,17 @@ export default function MoviePage({ category }: MoviePageProps) {
   }
 
   return (
-    <div>
+    <>
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 mb-10">
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} />
         ))}
       </div>
 
-      {}
       <div className="flex justify-center gap-4 items-center mb-10">
         <button
           disabled={page === 1}
-          onClick={() => setPage((prev) => prev - 1)}
+          onClick={() => setPage((p) => p - 1)}
           className={`px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 transition ${
             page === 1 ? 'opacity-50 cursor-not-allowed' : ''
           }`}
@@ -74,12 +76,12 @@ export default function MoviePage({ category }: MoviePageProps) {
         </button>
         <span className="font-bold text-lg">페이지 {page}</span>
         <button
-          onClick={() => setPage((prev) => prev + 1)}
+          onClick={() => setPage((p) => p + 1)}
           className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition"
         >
           다음
         </button>
       </div>
-    </div>
+    </>
   );
 }

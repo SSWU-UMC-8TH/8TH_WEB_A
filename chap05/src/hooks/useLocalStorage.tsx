@@ -1,8 +1,12 @@
 // hooks/useLocalStorage.ts
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
+  const isBrowser = typeof window !== 'undefined';
+
   const getItem = (): T => {
+    if (!isBrowser) return initialValue;
+
     try {
       const storedValue = localStorage.getItem(key);
       if (!storedValue || storedValue === 'undefined') {
@@ -15,12 +19,14 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   };
 
-  const [storedValue, setStoredValue] = useState<T>(getItem);
+  const [storedValue, setStoredValue] = useState<T>(() => getItem());
 
   const setItem = (value: T) => {
     try {
       setStoredValue(value);
-      localStorage.setItem(key, JSON.stringify(value));
+      if (isBrowser) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
     } catch (error) {
       console.error(`Error setting localStorage key “${key}”:`, error);
     }
@@ -28,7 +34,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
   const removeItem = () => {
     try {
-      localStorage.removeItem(key);
+      if (isBrowser) {
+        localStorage.removeItem(key);
+      }
       setStoredValue(initialValue);
     } catch (error) {
       console.error(`Error removing localStorage key “${key}”:`, error);

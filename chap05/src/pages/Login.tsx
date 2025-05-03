@@ -1,7 +1,7 @@
+// src/pages/Login.tsx
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import AuthButtons from '../components/AuthButtons';
 import { useAuth } from '../context/AuthContext'; // ✅ AuthContext 사용
 
 type LoginFormInputs = {
@@ -17,12 +17,13 @@ export default function Login() {
   } = useForm<LoginFormInputs>({ mode: 'onChange' });
 
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ login 함수 context에서 사용
+  const { login } = useAuth();
 
   const onSubmit = async (data: LoginFormInputs) => {
+    console.log('🛠️ onSubmit 호출됨:', data);
     try {
       console.log('로그인 요청 바디', data);
-      await login(data); // ✅ 로그인 처리 및 이동까지 내부에서 수행됨
+      await login(data); // 로그인 성공 시 navigate는 AuthContext에서 처리
     } catch (error: any) {
       console.error('로그인 실패', error);
       alert(
@@ -34,18 +35,23 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 relative">
-      {/* 🔒 로그인/회원가입 버튼 */}
-      <div className="absolute top-4 right-4">
-        <AuthButtons />
-      </div>
-
-      {/* ⬅️ 뒤로가기 버튼 */}
+      {/* 🔙 뒤로가기 */}
       <button
         className="absolute top-4 left-4 text-3xl"
         onClick={() => navigate(-1)}
       >
         &lt;
       </button>
+
+      {/* 회원가입으로 이동 */}
+      <div className="absolute top-4 right-4">
+        <Link
+          to="/signup"
+          className="text-sm bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-800 transition"
+        >
+          회원가입
+        </Link>
+      </div>
 
       <h1 className="text-2xl font-bold mb-6">로그인</h1>
 
@@ -125,3 +131,4 @@ export default function Login() {
     </div>
   );
 }
+
