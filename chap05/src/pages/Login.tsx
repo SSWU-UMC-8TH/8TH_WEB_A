@@ -1,8 +1,7 @@
-// src/pages/Login.tsx
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { useAuth } from '../context/AuthContext'; // ✅ AuthContext 사용
+import { useAuth } from '../context/AuthContext';
 
 type LoginFormInputs = {
   email: string;
@@ -23,7 +22,7 @@ export default function Login() {
     console.log('🛠️ onSubmit 호출됨:', data);
     try {
       console.log('로그인 요청 바디', data);
-      await login(data); // 로그인 성공 시 navigate는 AuthContext에서 처리
+      await login(data);
     } catch (error: any) {
       console.error('로그인 실패', error);
       alert(
@@ -31,6 +30,12 @@ export default function Login() {
           (error.response?.data?.message || '알 수 없는 오류')
       );
     }
+  };
+
+  // Google OAuth 로그인 핸들러 추가
+  const handleGoogleLogin = () => {
+    window.location.href =
+      `${import.meta.env.VITE_SERVER_API_URL}/v1/auth/google/login`;
   };
 
   return (
@@ -56,7 +61,11 @@ export default function Login() {
       <h1 className="text-2xl font-bold mb-6">로그인</h1>
 
       {/* 구글 로그인 버튼 */}
-      <button className="flex items-center gap-3 border rounded-md px-4 py-2 mb-4 w-full max-w-sm justify-center hover:bg-white/10 transition">
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="flex items-center gap-3 border rounded-md px-4 py-2 mb-4 w-full max-w-sm justify-center hover:bg-white/10 transition"
+      >
         <FcGoogle size={24} />
         <span>구글 로그인</span>
       </button>
@@ -131,4 +140,3 @@ export default function Login() {
     </div>
   );
 }
-
