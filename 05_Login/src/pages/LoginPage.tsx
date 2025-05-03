@@ -47,8 +47,8 @@ export const LoginPage = () => {
       console.log("로그인 성공:", response);
   
       localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
   
-
       navigate("/mypage");
   
     } catch (error) {
