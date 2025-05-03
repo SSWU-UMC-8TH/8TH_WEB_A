@@ -21,7 +21,7 @@ export const postSignup = async (
   console.log('회원가입 요청 바디:', body);
   // ApiResponse<ResponseSignupDto> 타입으로 받습니다
   const resp = await axiosInstance.post<ApiResponse<ResponseSignupDto>>(
-    '/auth/signup',
+    '/v1/auth/signup',
     body
   );
   // 실제 유저 데이터는 resp.data.data 안에 있습니다
@@ -35,7 +35,7 @@ export const postSignin = async (
   // ApiResponse<{ accessToken: string; refreshToken: string }>
   const resp = await axiosInstance.post<
     ApiResponse<{ accessToken: string; refreshToken: string }>
-  >('/auth/signin', body);
+  >('/v1/auth/signin', body);
 
   console.log('▶️ 원본 resp.data:', resp.data);
 
@@ -50,7 +50,7 @@ export const postSignin = async (
 export const getMyInfo = async (): Promise<ResponseMyInfoDto> => {
   // ApiResponse<ResponseMyInfoDto>
   const resp = await axiosInstance.get<ApiResponse<ResponseMyInfoDto>>(
-    '/users/me'
+    '/v1/users/me'
   );
   return resp.data.data;
 };
@@ -58,7 +58,7 @@ export const getMyInfo = async (): Promise<ResponseMyInfoDto> => {
 // src/apis/authApi.ts
 export const postLogout = async (): Promise<void> => {
     await axiosInstance.post(
-      '/auth/signout',
+      '/v1/auth/signout',
       {},                      // 빈 바디
       { withCredentials: true } // 쿠키 삭제를 위해 반드시 필요
     );
