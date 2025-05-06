@@ -8,7 +8,6 @@ import {
 } from '../types/authTypes';
 import { axiosInstance } from './axios';
 
-// Nest의 인터셉터가 감싼 형태: { statusCode, message, data }
 interface ApiResponse<T> {
   statusCode: number;
   message: string;
@@ -19,12 +18,10 @@ export const postSignup = async (
   body: RequestSignupDto
 ): Promise<ResponseSignupDto> => {
   console.log('회원가입 요청 바디:', body);
-  // ApiResponse<ResponseSignupDto> 타입으로 받습니다
   const resp = await axiosInstance.post<ApiResponse<ResponseSignupDto>>(
     '/v1/auth/signup',
     body
   );
-  // 실제 유저 데이터는 resp.data.data 안에 있습니다
   return resp.data.data;
 };
 

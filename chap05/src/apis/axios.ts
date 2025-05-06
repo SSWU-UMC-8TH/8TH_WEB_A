@@ -16,7 +16,6 @@ export const axiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
 });
 
-// 요청마다 AccessToken 헤더
 axiosInstance.interceptors.request.use((config) => {
   const token = getLocalStorage(LOCAL_STORAGE_KEY.accessToken);
   if (token && config.headers) {
@@ -25,7 +24,6 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 → 자동 리프레시
 axiosInstance.interceptors.response.use(
   (res) => res,
   async (err: AxiosError) => {
@@ -44,7 +42,7 @@ axiosInstance.interceptors.response.use(
         const refreshToken = getLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
         const { data: { data } } = await axiosInstance.post<ApiResponse<{ accessToken: string; refreshToken: string }>>(
           '/auth/refresh',
-          { refresh_token: refreshToken }  // 👈 서버가 snake_case를 기대한다면 이렇게
+          { refresh_token: refreshToken } 
         );
         const { accessToken, refreshToken: newRefresh } = data;
         setLocalStorage(LOCAL_STORAGE_KEY.accessToken, accessToken);
