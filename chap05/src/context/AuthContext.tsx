@@ -18,8 +18,8 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   accessToken: null,
-  login: async () => {},
-  logout: async () => {},
+  login: async () => { },
+  logout: async () => { }
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {

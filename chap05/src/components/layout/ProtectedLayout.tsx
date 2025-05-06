@@ -16,3 +16,5 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   return <>{children}</>; // ReactNode를 위해 fragment로 감싸는 게 안전
 }
+
+

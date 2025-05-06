@@ -1,13 +1,13 @@
-// HomeLayout.tsx
+// src/components/layout/HomeLayout.tsx
 import { Outlet } from 'react-router-dom';
-import Header from '../Header';
+import Navbar from '../Navbar';
 
 export default function HomeLayout() {
   return (
-    <div className="bg-black text-white min-h-screen">
-      <Header />
-      <main className="px-4 py-8">
-        <Outlet />
+    <div className="min-h-screen bg-black text-white">
+      <Navbar />
+      <main className="w-full px-3 py-8 bg-black">
+          <Outlet />
       </main>
     </div>
   );

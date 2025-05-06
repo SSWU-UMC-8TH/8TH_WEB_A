@@ -1,7 +1,10 @@
+// src/pages/Login.tsx
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../context/AuthContext';
+import AuthLayout from '../components/layout/AuthLayout';
+import { Link, useNavigate } from 'react-router-dom';
 
 type LoginFormInputs = {
   email: string;
@@ -9,122 +12,74 @@ type LoginFormInputs = {
 };
 
 export default function Login() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<LoginFormInputs>({ mode: 'onChange' });
-
-  const navigate = useNavigate();
+  const { register, handleSubmit, formState: { errors, isValid } } =
+    useForm<LoginFormInputs>({ mode: 'onChange' });
   const { login } = useAuth();
+  const navigate = useNavigate(); // ✅ navigate 추가
 
   const onSubmit = async (data: LoginFormInputs) => {
-    console.log('🛠️ onSubmit 호출됨:', data);
     try {
-      console.log('로그인 요청 바디', data);
-      await login(data);
-    } catch (error: any) {
-      console.error('로그인 실패', error);
-      alert(
-        '로그인 실패: ' +
-          (error.response?.data?.message || '알 수 없는 오류')
-      );
+      await login(data);       // ✅ 로그인 성공 후
+      navigate('/my');         // ✅ 마이페이지로 이동
+    } catch (err: any) {
+      alert('로그인 실패: ' + (err.response?.data?.message || err.message));
     }
   };
 
-  // Google OAuth 로그인 핸들러 추가
   const handleGoogleLogin = () => {
     window.location.href =
       `${import.meta.env.VITE_SERVER_API_URL}/v1/auth/google/login`;
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 relative">
-      {/* 🔙 뒤로가기 */}
-      <button
-        className="absolute top-4 left-4 text-3xl"
-        onClick={() => navigate(-1)}
-      >
-        &lt;
-      </button>
-
-      {/* 회원가입으로 이동 */}
-      <div className="absolute top-4 right-4">
-        <Link
-          to="/signup"
-          className="text-sm bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-800 transition"
-        >
-          회원가입
-        </Link>
-      </div>
-
-      <h1 className="text-2xl font-bold mb-6">로그인</h1>
-
-      {/* 구글 로그인 버튼 */}
+    <AuthLayout
+      title="로그인"
+      altLink={{ to: '/signup', label: '회원가입' }}
+    >
+      {/* 구글 로그인 */}
       <button
         type="button"
         onClick={handleGoogleLogin}
-        className="flex items-center gap-3 border rounded-md px-4 py-2 mb-4 w-full max-w-sm justify-center hover:bg-white/10 transition"
+        className="flex items-center gap-3 border rounded-md px-4 py-2 mb-4 w-full justify-center hover:bg-white/10 transition"
       >
         <FcGoogle size={24} />
         <span>구글 로그인</span>
       </button>
 
-      {/* 구분선 */}
-      <div className="flex items-center gap-3 mb-4 w-full max-w-sm">
+      {/* OR 구분선 */}
+      <div className="flex items-center gap-3 mb-4">
         <hr className="flex-grow border-gray-600" />
         <span className="text-gray-400 text-sm">OR</span>
         <hr className="flex-grow border-gray-600" />
       </div>
 
-      {/* 로그인 폼 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full max-w-sm flex flex-col gap-4"
-      >
-        {/* 이메일 입력 */}
-        <div>
-          <input
-            type="email"
-            placeholder="이메일을 입력해주세요!"
-            className="w-full px-4 py-2 rounded-md bg-zinc-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-            {...register('email', {
-              required: '이메일을 입력해주세요',
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: '올바른 이메일 형식을 입력해주세요.',
-              },
-            })}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
+      {/* 이메일/비밀번호 로그인 폼 */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <input
+          type="email"
+          placeholder="이메일을 입력해주세요!"
+          className="w-full px-4 py-2 rounded-md bg-zinc-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+          {...register('email', {
+            required: '이메일을 입력해주세요',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: '올바른 이메일 형식을 입력해주세요.',
+            },
+          })}
+        />
+        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-        {/* 비밀번호 입력 */}
-        <div>
-          <input
-            type="password"
-            placeholder="비밀번호를 입력해주세요!"
-            className="w-full px-4 py-2 rounded-md bg-zinc-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-            {...register('password', {
-              required: '비밀번호를 입력해주세요.',
-              minLength: {
-                value: 8,
-                message: '비밀번호는 8자 이상이어야 합니다.',
-              },
-            })}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+        <input
+          type="password"
+          placeholder="비밀번호를 입력해주세요!"
+          className="w-full px-4 py-2 rounded-md bg-zinc-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+          {...register('password', {
+            required: '비밀번호를 입력해주세요.',
+            minLength: { value: 8, message: '비밀번호는 8자 이상이어야 합니다.' },
+          })}
+        />
+        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
-        {/* 로그인 버튼 */}
         <button
           type="submit"
           disabled={!isValid}
@@ -137,6 +92,6 @@ export default function Login() {
           로그인
         </button>
       </form>
-    </div>
+    </AuthLayout>
   );
 }

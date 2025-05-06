@@ -1,227 +1,136 @@
 // src/pages/Signup.tsx
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, Link } from 'react-router-dom';
 import { postSignup } from '../apis/authApi';
+import { useNavigate } from 'react-router-dom';
+import AuthLayout from '../components/layout/AuthLayout';
 
-const emailSchema = z.object({
-  email: z.string().email('올바른 이메일 형식을 입력해주세요.'),
-});
-
+const emailSchema = z.object({ email: z.string().email('올바른 이메일 형식입니다.') });
 const passwordSchema = z
   .object({
     password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다.'),
     confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((d) => d.password === d.confirmPassword, {
     path: ['confirmPassword'],
     message: '비밀번호가 일치하지 않습니다.',
   });
+const nameSchema = z.object({ name: z.string().min(2, '이름을 입력해주세요.') });
 
-const nameSchema = z.object({
-  name: z.string().min(2, '이름을 입력해주세요.'),
-});
+type EmailForm = z.infer<typeof emailSchema>;
+type PasswordForm = z.infer<typeof passwordSchema>;
+type NameForm = z.infer<typeof nameSchema>;
 
 export default function Signup() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPasswords, setShowPasswords] = useState({
-    password: false,
-    confirm: false,
-  });
-
+  const [show, setShow] = useState({ pwd: false, confirm: false });
   const navigate = useNavigate();
 
   const {
-    register: registerEmail,
-    handleSubmit: handleEmailSubmit,
-    formState: { errors: emailErrors, isValid: isEmailValid },
-  } = useForm({ resolver: zodResolver(emailSchema), mode: 'onChange' });
+    register: regEmail,
+    handleSubmit: onSubmitEmail,
+    formState: { errors: emailErr, isValid: emailOk },
+  } = useForm<EmailForm>({ resolver: zodResolver(emailSchema), mode: 'onChange' });
 
   const {
-    register: registerPassword,
-    handleSubmit: handlePasswordSubmit,
-    formState: { errors: passwordErrors, isValid: isPasswordValid },
-  } = useForm({ resolver: zodResolver(passwordSchema), mode: 'onChange' });
+    register: regPwd,
+    handleSubmit: onSubmitPwd,
+    formState: { errors: pwdErr, isValid: pwdOk },
+  } = useForm<PasswordForm>({ resolver: zodResolver(passwordSchema), mode: 'onChange' });
 
   const {
-    register: registerName,
-    handleSubmit: handleNameSubmit,
-    formState: { isValid: isNameValid },
-  } = useForm({ resolver: zodResolver(nameSchema), mode: 'onChange' });
+    register: regName,
+    handleSubmit: onSubmitName,
+    formState: { isValid: nameOk },
+  } = useForm<NameForm>({ resolver: zodResolver(nameSchema), mode: 'onChange' });
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-black text-white relative">
-      {/* 뒤로가기 */}
-      <button className="absolute top-4 left-4" onClick={() => navigate(-1)}>
-        &lt;
-      </button>
-
-      {/* 로그인 이동 */}
-      <div className="absolute top-4 right-4">
-        <Link
-          to="/login"
-          className="text-sm bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-800 transition"
-        >
-          로그인
-        </Link>
-      </div>
-
-      <h1 className="text-2xl font-bold mb-6">회원가입</h1>
-
-      {/* 1단계: 이메일 */}
+    <AuthLayout title="회원가입" altLink={{ to: '/login', label: '로그인' }}>
+      {/* 1: 이메일 입력 */}
       {step === 1 && (
-        <form
-          onSubmit={handleEmailSubmit((data) => {
-            setEmail(data.email);
-            setStep(2);
-          })}
-          className="w-80 flex flex-col gap-4"
-        >
+        <form onSubmit={onSubmitEmail((d) => { setEmail(d.email); setStep(2); })} className="flex flex-col gap-4">
           <input
             type="email"
             placeholder="이메일을 입력해주세요!"
             className="p-3 rounded text-black bg-zinc-100"
-            {...registerEmail('email')}
+            {...regEmail('email')}
             autoComplete="email"
           />
-          {emailErrors.email && (
-            <p className="text-red-400 text-sm">{emailErrors.email.message}</p>
-          )}
-          <button
-            type="submit"
-            disabled={!isEmailValid}
-            className={`p-2 rounded ${isEmailValid ? 'bg-pink-500' : 'bg-gray-700'}`}
-          >
+          {emailErr.email && <p className="text-red-400 text-sm">{emailErr.email.message}</p>}
+          <button type="submit" disabled={!emailOk} className={`p-2 rounded ${emailOk ? 'bg-pink-500' : 'bg-gray-700'}`}>
             다음
           </button>
         </form>
       )}
 
-      {/* 2단계: 비밀번호 */}
+      {/* 2: 비밀번호 입력 */}
       {step === 2 && (
-        <form
-          onSubmit={handlePasswordSubmit((data) => {
-            setPassword(data.password);
-            setStep(3);
-          })}
-          className="w-80 flex flex-col gap-4"
-        >
+        <form onSubmit={onSubmitPwd((d) => { setPassword(d.password); setStep(3); })} className="flex flex-col gap-4">
           <p className="text-left mb-1">📧 {email}</p>
-
-          {/* 비밀번호 */}
           <div className="relative">
             <input
-              type={showPasswords.password ? 'text' : 'password'}
+              type={show.pwd ? 'text' : 'password'}
               placeholder="비밀번호를 입력해주세요!"
-              className="p-3 rounded w-full text-black bg-zinc-100"
-              {...registerPassword('password')}
+              className="p-3 rounded text-black bg-zinc-100"
+              {...regPwd('password')}
               autoComplete="new-password"
             />
-            <button
-              type="button"
-              className="absolute right-3 top-3 text-gray-600"
-              onClick={() =>
-                setShowPasswords((prev) => ({
-                  ...prev,
-                  password: !prev.password,
-                }))
-              }
-            >
+            <button type="button" className="absolute right-3 top-3" onClick={() => setShow((s) => ({ ...s, pwd: !s.pwd }))}>
               👁️
             </button>
           </div>
-          {passwordErrors.password && (
-            <p className="text-red-400 text-sm">{passwordErrors.password.message}</p>
-          )}
+          {pwdErr.password && <p className="text-red-400 text-sm">{pwdErr.password.message}</p>}
 
-          {/* 비밀번호 확인 */}
           <div className="relative">
             <input
-              type={showPasswords.confirm ? 'text' : 'password'}
-              placeholder="비밀번호를 다시 한 번 입력해주세요!"
-              className="p-3 rounded w-full text-black bg-zinc-100"
-              {...registerPassword('confirmPassword')}
+              type={show.confirm ? 'text' : 'password'}
+              placeholder="비밀번호 확인"
+              className="p-3 rounded text-black bg-zinc-100"
+              {...regPwd('confirmPassword')}
               autoComplete="new-password"
             />
-            <button
-              type="button"
-              className="absolute right-3 top-3 text-gray-600"
-              onClick={() =>
-                setShowPasswords((prev) => ({
-                  ...prev,
-                  confirm: !prev.confirm,
-                }))
-              }
-            >
+            <button type="button" className="absolute right-3 top-3" onClick={() => setShow((s) => ({ ...s, confirm: !s.confirm }))}>
               👁️
             </button>
           </div>
-          {passwordErrors.confirmPassword && (
-            <p className="text-red-400 text-sm">{passwordErrors.confirmPassword.message}</p>
-          )}
+          {pwdErr.confirmPassword && <p className="text-red-400 text-sm">{pwdErr.confirmPassword.message}</p>}
 
-          <button
-            type="submit"
-            disabled={!isPasswordValid}
-            className={`p-2 rounded ${isPasswordValid ? 'bg-pink-500' : 'bg-gray-700'}`}
-          >
+          <button type="submit" disabled={!pwdOk} className={`p-2 rounded ${pwdOk ? 'bg-pink-500' : 'bg-gray-700'}`}>
             다음
           </button>
         </form>
       )}
 
-      {/* 3단계: 이름 */}
+      {/* 3: 이름 입력 및 API 호출 */}
       {step === 3 && (
         <form
-          onSubmit={handleNameSubmit(async (data) => {
-            const signupData = {
-              email,
-              password,
-              name: data.name,
-              bio: '자기소개 없음',
-              avatar: '/default-avatar.png', // ✅ 기본값으로 변경
-            };
-
-            console.log('회원가입 요청 바디:', signupData);
-
+          onSubmit={onSubmitName(async (d) => {
             try {
-              await postSignup(signupData);
-              alert(`회원가입 완료! 이름: ${data.name}`);
+              await postSignup({ email, password, name: d.name});
+              alert('회원가입 완료!');
               navigate('/login');
-            } catch (err: any) {
-              console.error('회원가입 실패 응답:', err);
-              alert(
-                '회원가입 실패: ' +
-                  (err.response?.data?.message || '알 수 없는 오류')
-              );
+            } catch (e: any) {
+              alert('회원가입 실패: ' + (e.response?.data?.message || e.message));
             }
           })}
-          className="w-80 flex flex-col gap-4 items-center"
+          className="flex flex-col gap-4 items-center"
         >
-          <img
-            src="/default-avatar.png"
-            alt="avatar"
-            className="w-20 h-20 rounded-full mb-2"
-          />
+          <img src="/default-avatar.png" alt="avatar" className="w-20 h-20 rounded-full mb-2" />
           <input
             placeholder="이름을 입력해주세요!"
             className="p-3 rounded text-black w-full bg-zinc-100"
-            {...registerName('name')}
+            {...regName('name')}
             autoComplete="name"
           />
-          <button
-            type="submit"
-            disabled={!isNameValid}
-            className={`p-2 w-full rounded ${isNameValid ? 'bg-pink-500' : 'bg-gray-700'}`}
-          >
+          <button type="submit" disabled={!nameOk} className={`p-2 w-full rounded ${nameOk ? 'bg-pink-500' : 'bg-gray-700'}`}>
             회원가입 완료
           </button>
         </form>
       )}
-    </div>
+    </AuthLayout>
   );
 }
