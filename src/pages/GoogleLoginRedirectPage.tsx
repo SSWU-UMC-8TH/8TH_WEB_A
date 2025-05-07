@@ -1,7 +1,6 @@
 import { useEffect } from "react"
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { LOCAL_STORAGE_KEY } from "../constants/key";
-import { set } from "react-hook-form";
 
 export const GoogleLoginRedirectPage = () => {
   const {setItem:setAccessToken} = useLocalStorage(LOCAL_STORAGE_KEY.accessToken);
@@ -16,7 +15,7 @@ export const GoogleLoginRedirectPage = () => {
     if (accessToken) {
       setAccessToken(accessToken);
       setRefreshToken(refreshToken);
-      window.location.href = "/my";
+      window.location.href = "/";
     }
   }, [setAccessToken, setRefreshToken]);
 
