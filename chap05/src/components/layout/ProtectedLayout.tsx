@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>; // ReactNode를 위해 fragment로 감싸는 게 안전
+  return <>{children}</>; // 레이아웃은 외부에서 관리하므로 감싸지 않음
 }
 
 

@@ -1,23 +1,19 @@
-import {useQuery} from "@tanstack/react-query";
-import { PaginationDto} from "../../types/Common";
+import { useQuery } from "@tanstack/react-query";
+import { PaginationDto } from "../../types/Common";
+import { getLpList } from "../../apis/lp";
 import { QUERY_KEY } from "../../constants/key";
-import { getLPList } from "../../apis/lp";
-import { RseponseLpListDto } from "../../types/lpTypes";
+import { Lp, ResponseLPListDto } from "../../types/lpTypes";
 
+function useGetLpList(params: PaginationDto) {
+  return useQuery<ResponseLPListDto, Error, Lp[]>({
+    queryKey: [QUERY_KEY.lps, params.search, params.order],
+    queryFn: () => getLpList(params),
 
-function useGetLPList({cursor, search, order, limit}: PaginationDto) {
-    return useQuery({
-        queryKey: [QUERY_KEY.lps,search, order],
-        queryFn: () => 
-            getLPList({
-                cursor, search, order, limit
-         }),
+    select: (data) => {  console.log("👉 API 응답 구조", data);
+         return data.data.data; },
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+  });
+}
 
-         staleTime: 1000 * 60 * 5, // 5분
-         gcTime: 1000 * 60 * 10, // 10분
-
-         select: (data : RseponseLpListDto) => data.data,
-    });
-};
-
-export default useGetLPList;
+export default useGetLpList;

@@ -1,14 +1,24 @@
 // src/components/layout/HomeLayout.tsx
-import { Outlet } from 'react-router-dom';
-import Navbar from '../Navbar';
+import { Outlet } from "react-router-dom"
+import Navbar  from "../Navbar";
+import { useState } from "react";
+import Sidebar from "../../components/Sidebar";
+import { AuthProvider } from "../../context/AuthContext";
 
-export default function HomeLayout() {
+const HomeLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Navbar />
-      <main className="w-full px-3 py-8 bg-black">
+    <AuthProvider>
+      <div className="h-dvh flex flex-col">
+        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <main className="flex-1 mt-20 bg-black text-white">
           <Outlet />
-      </main>
-    </div>
-  );
-}
+        </main>
+      </div>
+    </AuthProvider>
+  )
+};
+
+export default HomeLayout;

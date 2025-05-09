@@ -1,45 +1,56 @@
 // src/context/AuthContext.tsx
-import { createContext, PropsWithChildren, useContext, useState } from 'react';
-import { postSignin, postLogout } from '../apis/authApi';
+import { createContext, PropsWithChildren, useContext, useState, useEffect } from 'react';
+import { postSignin, postLogout, getMyInfo } from '../apis/authApi';
 import {
   getLocalStorage,
   setLocalStorage,
   removeLocalStorage,
 } from '../utils/localStorage';
 import { LOCAL_STORAGE_KEY } from '../constants/key';
-import { RequestSigninDto } from '../types/authTypes';
-import { useNavigate } from 'react-router-dom';
+import { RequestSigninDto, ResponseMyInfoDto } from '../types/authTypes';
 
 interface AuthContextType {
   accessToken: string | null;
+  user: ResponseMyInfoDto | null;
   login: (data: RequestSigninDto) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   accessToken: null,
-  login: async () => { },
-  logout: async () => { }
+  user: null,
+  login: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [accessToken, _setAccessToken] = useState<string | null>(
     getLocalStorage(LOCAL_STORAGE_KEY.accessToken)
   );
-  const navigate = useNavigate();
+  const [user, setUser] = useState<ResponseMyInfoDto | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (accessToken) {
+        try {
+          const userInfo = await getMyInfo();
+          setUser(userInfo);
+        } catch (e) {
+          console.error('유저 정보 가져오기 실패:', e);
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, [accessToken]);
 
   const login = async (signinData: RequestSigninDto) => {
-    try {
-      const { access_token, refresh_token } = await postSignin(signinData);
-      // 1) utils 로 raw 문자열 저장
-      setLocalStorage(LOCAL_STORAGE_KEY.accessToken, access_token);
-      setLocalStorage(LOCAL_STORAGE_KEY.refreshToken, refresh_token);
-      // 2) state 업데이트
-      _setAccessToken(access_token);
-      navigate('/my', { replace: true });
-    } catch (e) {
-      alert('로그인 실패');
-    }
+    const { access_token, refresh_token } = await postSignin(signinData);
+    setLocalStorage(LOCAL_STORAGE_KEY.accessToken, access_token);
+    setLocalStorage(LOCAL_STORAGE_KEY.refreshToken, refresh_token);
+    _setAccessToken(access_token);
   };
 
   const logout = async () => {
@@ -49,12 +60,12 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       removeLocalStorage(LOCAL_STORAGE_KEY.accessToken);
       removeLocalStorage(LOCAL_STORAGE_KEY.refreshToken);
       _setAccessToken(null);
-      navigate('/login', { replace: true });
+      setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, login, logout }}>
+    <AuthContext.Provider value={{ accessToken, login, logout, user }}>
       {children}
     </AuthContext.Provider>
   );

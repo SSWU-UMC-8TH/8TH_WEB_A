@@ -15,12 +15,12 @@ export default function Login() {
   const { register, handleSubmit, formState: { errors, isValid } } =
     useForm<LoginFormInputs>({ mode: 'onChange' });
   const { login } = useAuth();
-  const navigate = useNavigate(); // ✅ navigate 추가
+  const navigate = useNavigate(); 
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await login(data);       // ✅ 로그인 성공 후
-      navigate('/my');         // ✅ 마이페이지로 이동
+      await login(data);       
+      navigate('/my');       
     } catch (err: any) {
       alert('로그인 실패: ' + (err.response?.data?.message || err.message));
     }
