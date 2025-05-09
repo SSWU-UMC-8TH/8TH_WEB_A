@@ -1,4 +1,3 @@
-// src/routes/AppRouter.tsx
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import HomeLayout from '../components/layout/HomeLayout';
@@ -9,11 +8,12 @@ import NotFoundPage from '../pages/NotFoundPage';
 import { GoogleLoginRedirectPage } from '../pages/GoogleLoginRedirectPage';
 import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../pages/MyPage';
+import LpDetailPage from '../pages/LpDetailPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomeLayout />, // 여기서 AuthProvider 감싸기
+    element: <HomeLayout />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'login', element: <Login /> },
@@ -24,6 +24,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MyPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'lp/:id',
+        element: (
+          <ProtectedRoute>
+            <LpDetailPage />
           </ProtectedRoute>
         ),
       },

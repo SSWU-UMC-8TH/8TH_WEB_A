@@ -28,7 +28,6 @@ export const HomePage = () => {
 
   return (
     <div className="p-6 bg-black min-h-screen text-white">
-      {/* 검색 및 정렬 버튼 */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <input
           value={search}
@@ -56,7 +55,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* LP 카드 목록 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {data?.map((lp) => (
           <div
@@ -80,7 +78,7 @@ export const HomePage = () => {
               className="w-full h-48 object-cover"
             />
 
-            {/* 오버레이 */}
+            
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 flex flex-col justify-end backdrop-blur-sm">
               <h3 className="text-lg font-semibold truncate text-white drop-shadow-md">
                 {lp.title}
