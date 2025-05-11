@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useGetLpDetail from "../hooks/queries/useGetLpDetail";
+import CommentSection from "../pages/CommentSection";
 
 const LpDetailPage = () => {
   const { id } = useParams();
@@ -26,6 +27,9 @@ const LpDetailPage = () => {
           <button className="bg-gray-700 px-4 py-1 rounded">삭제</button>
           <button className="bg-gray-700 px-4 py-1 rounded">좋아요</button>
         </div>
+
+        <CommentSection lpId={Number(id)} />
+
       </div>
     </div>
   );

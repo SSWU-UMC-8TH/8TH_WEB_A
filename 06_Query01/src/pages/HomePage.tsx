@@ -4,6 +4,10 @@ import useGetLpList from "../hooks/queries/useGetLpList";
 import { PAGINATION_ORDER } from "../types/common";
 import { useNavigate } from "react-router-dom";
 
+const SkeletonCard = () => (
+  <div className="animate-pulse bg-gray-800 rounded-md shadow-md h-64 w-full" />
+);
+
 export const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
