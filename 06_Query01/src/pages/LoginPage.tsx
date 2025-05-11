@@ -48,8 +48,9 @@ export const LoginPage = () => {
   
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("refreshToken", response.data.refreshToken);
+      localStorage.setItem("username", response.data.name);
   
-      navigate("/mypage");
+      navigate("/home");
   
     } catch (error) {
       console.error("로그인 실패:", error);
