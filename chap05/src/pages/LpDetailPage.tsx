@@ -2,17 +2,17 @@ import { useParams } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, Edit, Trash } from "lucide-react";
 import useGetLpDetail from "../hooks/queries/useGetLpDetail";
+import CommentSection from "../components/Comment/CommentSection"
 
 const LpDetailPage = () => {
   const { id } = useParams();
   console.log("📌 useParams id:", id);
 
-
   const {
     data: lp,
     isLoading,
     isError,
-  } = useGetLpDetail({ id: id as string });
+  } = useGetLpDetail({ id: id as string }, !!id);
 
   console.log("📌 useGetLpDetail result:", lp);
   console.log("❗ isError:", isError, "❗ error:", isError);
@@ -27,8 +27,8 @@ const LpDetailPage = () => {
     );
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 py-8 flex justify-center">
-      <div className="max-w-3xl w-full bg-gray-900 rounded-xl shadow-lg p-6 relative">
+    <div className="min-h-screen bg-black text-white px-4 py-8 flex flex-col items-center">
+      <div className="max-w-3xl w-full bg-gray-900 rounded-xl shadow-lg p-6 relative mb-10">
         <div className="absolute top-4 right-4 flex gap-3 text-gray-400">
           <button title="수정">
             <Edit className="w-5 h-5 hover:text-white" />
@@ -81,6 +81,8 @@ const LpDetailPage = () => {
           <span>{lp.likes?.length ?? 0}</span>
         </div>
       </div>
+
+      {id && <CommentSection lpId={id as string} />}
     </div>
   );
 };

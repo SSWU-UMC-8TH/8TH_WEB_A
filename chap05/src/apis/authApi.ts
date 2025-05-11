@@ -57,7 +57,7 @@ export const postLogout = async (): Promise<void> => {
     await axiosInstance.post(
       '/v1/auth/signout',
       {},                      // 빈 바디
-      { withCredentials: true } // 쿠키 삭제를 위해 반드시 필요
+      { withCredentials: true } 
     );
    };
   

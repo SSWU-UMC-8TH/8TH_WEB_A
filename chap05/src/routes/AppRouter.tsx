@@ -8,7 +8,7 @@ import NotFoundPage from '../pages/NotFoundPage';
 import { GoogleLoginRedirectPage } from '../pages/GoogleLoginRedirectPage';
 import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../pages/MyPage';
-import LpDetailPage from '../pages/LpDetailPage'
+import LpDetailPage from '../pages/LpDetailPage'
 
 export const router = createBrowserRouter([
   {
