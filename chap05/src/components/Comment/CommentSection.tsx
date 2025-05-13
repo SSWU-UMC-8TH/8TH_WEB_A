@@ -26,11 +26,14 @@ interface PaginatedResponse {
 
 interface Props {
   lpId: string;
+  currentUserId: number;
 }
 
-export const CommentSection = ({ lpId }: Props) => {
+export const CommentSection = ({ lpId, currentUserId }: Props) => {
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [content, setContent] = useState('');
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState('');
   const queryClient = useQueryClient();
   const { ref, inView } = useInView();
 
@@ -64,6 +67,26 @@ export const CommentSection = ({ lpId }: Props) => {
     },
     onSuccess: () => {
       setContent('');
+      queryClient.invalidateQueries({ queryKey: ['comments', lpId, order] });
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await axiosInstance.delete(`/v1/lps/${lpId}/comments/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', lpId, order] });
+    },
+  });
+
+  const editCommentMutation = useMutation({
+    mutationFn: async ({ id, content }: { id: number; content: string }) => {
+      return await axiosInstance.patch(`/v1/lps/${lpId}/comments/${id}`, { content });
+    },
+    onSuccess: () => {
+      setEditId(null);
+      setEditContent('');
       queryClient.invalidateQueries({ queryKey: ['comments', lpId, order] });
     },
   });
@@ -121,9 +144,54 @@ export const CommentSection = ({ lpId }: Props) => {
               className="w-8 h-8 rounded-full"
               alt="프로필"
             />
-            <div>
-              <p className="font-semibold">{comment.author.name}</p>
-              <p>{comment.content}</p>
+            <div className="flex-1">
+              <div className="flex justify-between items-center">
+                <p className="font-semibold">{comment.author.name}</p>
+                {comment.author.id === currentUserId && (
+                  <div className="relative">
+                    <button onClick={() => setEditId(editId === comment.id ? null : comment.id)}>⋯</button>
+                    {editId === comment.id && (
+                      <div className="absolute right-0 mt-2 bg-gray-700 rounded shadow-md z-10 text-sm">
+                        <button
+                          onClick={() => setEditContent(comment.content)}
+                          className="block w-full px-4 py-1 hover:bg-gray-600"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => deleteCommentMutation.mutate(comment.id)}
+                          className="block w-full px-4 py-1 hover:bg-red-600 text-red-200"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {editId === comment.id ? (
+                <div className="mt-2">
+                  <input
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="w-full px-3 py-1 rounded bg-gray-600 text-white"
+                  />
+                  <div className="flex justify-end gap-2 mt-1">
+                    <button onClick={() => setEditId(null)} className="text-sm text-gray-300">
+                      취소
+                    </button>
+                    <button
+                      onClick={() => editCommentMutation.mutate({ id: comment.id, content: editContent })}
+                      className="text-sm text-blue-400 hover:text-blue-200"
+                    >
+                      저장
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-1 text-gray-200">{comment.content}</p>
+              )}
             </div>
           </li>
         ))}

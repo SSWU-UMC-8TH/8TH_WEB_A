@@ -6,12 +6,14 @@ import { PAGINATION_ORDER } from "../enums/common";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { LpCardSkeletonList } from "../components/layout/LpCard/LpCardSkeletonList";
+import { AddLpModal } from "../components/AddLpModal"; // ✅ 모달 import
 
 export const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState(PAGINATION_ORDER.desc);
   const { accessToken } = useAuth() || {};
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ 모달 상태
 
   const {
     data,
@@ -37,13 +39,15 @@ export const HomePage = () => {
     return <div className="mt-20 text-white">⏳ 로딩 중입니다...</div>;
   if (isError)
     return (
-      <div className="mt-20 text-white">⚠️ 데이터를 불러오는 중 오류가 발생했습니다.</div>
+      <div className="mt-20 text-white">
+        ⚠️ 데이터를 불러오는 중 오류가 발생했습니다.
+      </div>
     );
   if (!flatData || flatData.length === 0)
     return <div className="text-white">🙅 데이터 없음</div>;
 
   return (
-    <div className="p-6 bg-black min-h-screen text-white">
+    <div className="relative p-6 bg-black min-h-screen text-white">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <input
           value={search}
@@ -80,7 +84,9 @@ export const HomePage = () => {
               if (accessToken) {
                 navigate(`/lp/${lp.id}`);
               } else {
-                if (window.confirm("로그인이 필요합니다. 로그인 하시겠습니까?")) {
+                if (
+                  window.confirm("로그인이 필요합니다. 로그인 하시겠습니까?")
+                ) {
                   navigate("/login");
                 }
               }
@@ -88,7 +94,11 @@ export const HomePage = () => {
           >
             <img
               src={lp.thumbnail}
-              alt={typeof lp.title === "string" ? lp.title : String(lp.title ?? "Untitled")}
+              alt={
+                typeof lp.title === "string"
+                  ? lp.title
+                  : String(lp.title ?? "Untitled")
+              }
               className="w-full h-48 object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-3 flex flex-col justify-end backdrop-blur-sm">
@@ -106,6 +116,17 @@ export const HomePage = () => {
       </div>
 
       <div ref={ref} className="h-1" />
+
+      {/* ✅ + 버튼 */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-pink-500 text-white text-3xl shadow-lg z-40 hover:bg-pink-600"
+      >
+        +
+      </button>
+
+      {/* ✅ 모달 */}
+      {isModalOpen && <AddLpModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };

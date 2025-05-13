@@ -23,6 +23,7 @@ export type ResponseSigninDto = {
 };
 
 export type ResponseMyInfoDto = {
+  bio: string;
   id: number;
   name: string;
   email: string;

@@ -2,10 +2,13 @@ import { useParams } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, Edit, Trash } from "lucide-react";
 import useGetLpDetail from "../hooks/queries/useGetLpDetail";
-import CommentSection from "../components/Comment/CommentSection"
+import CommentSection from "../components/Comment/CommentSection";
+import { useAuth } from "../context/AuthContext";
 
 const LpDetailPage = () => {
   const { id } = useParams();
+  const { user } = useAuth();
+
   console.log("📌 useParams id:", id);
 
   const {
@@ -82,7 +85,7 @@ const LpDetailPage = () => {
         </div>
       </div>
 
-      {id && <CommentSection lpId={id as string} />}
+      {user && id && <CommentSection lpId={id as string} currentUserId={user.id} />}
     </div>
   );
 };
