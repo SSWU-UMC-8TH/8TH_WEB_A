@@ -24,6 +24,7 @@ export type Lp = {
   tags: Tag[];
   likes: Likes[];
   author: {
+    id: number;
     name: string;
     profileUrl: string;
   };

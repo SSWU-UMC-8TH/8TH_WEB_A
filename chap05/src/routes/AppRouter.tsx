@@ -8,7 +8,8 @@ import NotFoundPage from '../pages/NotFoundPage';
 import { GoogleLoginRedirectPage } from '../pages/GoogleLoginRedirectPage';
 import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../pages/MyPage';
-import LpDetailPage from '../pages/LpDetailPage'
+import LpDetailPage from '../pages/LpDetailPage';
+import LpEditPage from '../pages/LPEditPage'; // ✅ 수정 페이지 import 추가
 
 export const router = createBrowserRouter([
   {
@@ -34,6 +35,14 @@ export const router = createBrowserRouter([
             <LpDetailPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: 'lp/edit/:id',
+        element: (
+          <ProtectedRoute>
+            <LpEditPage />
+          </ProtectedRoute>
+        )
       },
       { path: '*', element: <NotFoundPage /> },
     ],

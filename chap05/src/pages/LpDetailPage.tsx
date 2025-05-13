@@ -1,15 +1,18 @@
-import { useParams } from "react-router-dom";
+// src/pages/LpDetailPage.tsx
+import { useParams, useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { Heart, Edit, Trash } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useGetLpDetail from "../hooks/queries/useGetLpDetail";
 import CommentSection from "../components/Comment/CommentSection";
 import { useAuth } from "../context/AuthContext";
+import { axiosInstance } from "../apis/axios";
 
 const LpDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
-
-  console.log("📌 useParams id:", id);
 
   const {
     data: lp,
@@ -17,8 +20,29 @@ const LpDetailPage = () => {
     isError,
   } = useGetLpDetail({ id: id as string }, !!id);
 
-  console.log("📌 useGetLpDetail result:", lp);
-  console.log("❗ isError:", isError, "❗ error:", isError);
+  const isAuthor = user && lp?.author?.id === user.id;
+  const liked = user && lp?.likes?.some((like: any) => like.userId === user.id);
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => await axiosInstance.delete(`/v1/lps/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lps"] });
+      navigate("/");
+    },
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      if (liked) {
+        return await axiosInstance.delete(`/v1/lps/${id}/likes`);
+      } else {
+        return await axiosInstance.post(`/v1/lps/${id}/likes`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lp", id] });
+    },
+  });
 
   if (isLoading)
     return <div className="text-white mt-20">⏳ 로딩 중...</div>;
@@ -32,14 +56,23 @@ const LpDetailPage = () => {
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8 flex flex-col items-center">
       <div className="max-w-3xl w-full bg-gray-900 rounded-xl shadow-lg p-6 relative mb-10">
-        <div className="absolute top-4 right-4 flex gap-3 text-gray-400">
-          <button title="수정">
-            <Edit className="w-5 h-5 hover:text-white" />
-          </button>
-          <button title="삭제">
-            <Trash className="w-5 h-5 hover:text-red-500" />
-          </button>
-        </div>
+        {isAuthor && (
+          <div className="absolute top-4 right-4 flex gap-3 text-gray-400">
+            <button title="수정" onClick={() => navigate(`/lp/edit/${id}`)}>
+              <Edit className="w-5 h-5 hover:text-white" />
+            </button>
+            <button
+              title="삭제"
+              onClick={() => {
+                if (window.confirm("정말 삭제하시겠습니까?")) {
+                  deleteMutation.mutate();
+                }
+              }}
+            >
+              <Trash className="w-5 h-5 hover:text-red-500" />
+            </button>
+          </div>
+        )}
 
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
@@ -80,7 +113,13 @@ const LpDetailPage = () => {
         </div>
 
         <div className="flex items-center gap-2 text-pink-500">
-          <Heart className="w-5 h-5" />
+          <button
+            onClick={() => user && likeMutation.mutate()}
+            title="좋아요"
+            className="hover:text-pink-300"
+          >
+            <Heart className={`w-5 h-5 ${liked ? "fill-current" : ""}`} />
+          </button>
           <span>{lp.likes?.length ?? 0}</span>
         </div>
       </div>

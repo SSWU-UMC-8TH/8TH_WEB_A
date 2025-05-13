@@ -5,6 +5,7 @@ import { useInView } from 'react-intersection-observer';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { axiosInstance } from '../../apis/axios';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface Comment {
   id: number;
@@ -148,24 +149,16 @@ export const CommentSection = ({ lpId, currentUserId }: Props) => {
               <div className="flex justify-between items-center">
                 <p className="font-semibold">{comment.author.name}</p>
                 {comment.author.id === currentUserId && (
-                  <div className="relative">
-                    <button onClick={() => setEditId(editId === comment.id ? null : comment.id)}>⋯</button>
-                    {editId === comment.id && (
-                      <div className="absolute right-0 mt-2 bg-gray-700 rounded shadow-md z-10 text-sm">
-                        <button
-                          onClick={() => setEditContent(comment.content)}
-                          className="block w-full px-4 py-1 hover:bg-gray-600"
-                        >
-                          수정
-                        </button>
-                        <button
-                          onClick={() => deleteCommentMutation.mutate(comment.id)}
-                          className="block w-full px-4 py-1 hover:bg-red-600 text-red-200"
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    )}
+                  <div className="flex gap-2">
+                    <button onClick={() => {
+                      setEditId(comment.id);
+                      setEditContent(comment.content);
+                    }}>
+                      <Pencil className="w-4 h-4 text-blue-300 hover:text-blue-500" />
+                    </button>
+                    <button onClick={() => deleteCommentMutation.mutate(comment.id)}>
+                      <Trash2 className="w-4 h-4 text-red-300 hover:text-red-500" />
+                    </button>
                   </div>
                 )}
               </div>
@@ -190,7 +183,7 @@ export const CommentSection = ({ lpId, currentUserId }: Props) => {
                   </div>
                 </div>
               ) : (
-                <p className="mt-1 text-gray-200">{comment.content}</p>
+                <p className="mt-1 text-gray-200 whitespace-pre-line">{comment.content}</p>
               )}
             </div>
           </li>

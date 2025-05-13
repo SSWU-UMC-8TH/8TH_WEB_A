@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ResponseMyInfoDto } from "../types/authTypes";
 import { getMyInfo } from "../apis/authApi";
+import { useMutation } from "@tanstack/react-query";
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -28,10 +29,14 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     fetchData();
   }, [accessToken]);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/");
-  };
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await logout();
+    },
+    onSuccess: () => {
+      navigate("/");
+    },
+  });
 
   return (
     <nav className="bg-black dark:bg-gray-900 fixed top-0 left-0 w-full z-30 shadow-md">
@@ -76,7 +81,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
                   {data?.name ?? "사용자"}님 반갑습니다
                 </span>
                 <button
-                  onClick={handleLogout}
+                  onClick={() => logoutMutation.mutate()}
                   className="text-sm bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
                 >
                   로그아웃

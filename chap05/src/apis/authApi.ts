@@ -8,6 +8,7 @@ import {
 } from '../types/authTypes';
 import { axiosInstance } from './axios';
 
+
 interface ApiResponse<T> {
   statusCode: number;
   message: string;
@@ -61,3 +62,7 @@ export const postLogout = async (): Promise<void> => {
     );
    };
   
+
+   export const deleteUser = async (): Promise<void> => {
+    await axiosInstance.delete('/v1/users');
+  };
