@@ -1,3 +1,4 @@
+import { RequestUserDto } from "../types/auts";
 import { PaginationDto } from "../types/common";
 import { CreateLpDto, GetCommentParams, RequestLpDto, ResponseCommentListDto, ResponseLikeLpDto, ResponseLpDto, ResponseLPListDto } from "../types/lp";
 import { axiosInstance } from "./axios";
@@ -54,4 +55,9 @@ export const uploadImageToServer = async (file: File): Promise<string> => {
     },
   });
   return res.data.data.imageUrl;
+}
+
+export const patchUser = async ( formData:FormData | RequestUserDto) => {
+  const { data } = await axiosInstance.patch("/v1/users", formData,);
+  return data;
 }

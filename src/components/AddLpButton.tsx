@@ -7,7 +7,7 @@ export const LpAddButton = () => {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       <button
-        className="w-14 h-14 rounded-full bg-blue-500 text-white text-3xl shadow-lg hover:bg-blue-600 transition-colors"
+        className="w-14 h-14 rounded-full bg-black text-white text-3xl shadow-lg hover:bg-black-600 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         +

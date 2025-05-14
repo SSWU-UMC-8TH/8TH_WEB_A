@@ -3,9 +3,10 @@ import useForm from "../hooks/useForm";
 import { UserSigninInformation, validateSignin } from "../utils/validate";
 import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
+import { useLoginMutation } from "../hooks/mutations/useLogin";
 
 const LoginPage = () => {
-  const { login, accessToken } = useAuth();
+  const { accessToken } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,9 +22,11 @@ const LoginPage = () => {
     },
     validate: validateSignin,
   });
+
+  const { mutate: loginMutate, isPending } = useLoginMutation();
   
   const handleSubmit = async () => {
-    await login(values);
+    loginMutate(values);
   };
 
   const handleGoogleLogin = () => {
@@ -64,7 +67,7 @@ const LoginPage = () => {
           className="w-full bg-black text-white py-3 rounded-md text-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300"
           type="button"
           onClick={handleSubmit}
-          disabled={isDisabled}
+          disabled={isDisabled || isPending}
         >
           로그인
         </button>
