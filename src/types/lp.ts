@@ -68,4 +68,12 @@ export type GetCommentParams = {
 
 export type ResponseCommentListDto = CursorBasedResponse<Comments[]>;
 
+export type CreateLpDto = {
+  title: string;
+  content: string;
+  thumbnail: string;
+  tags: string[];
+  published: boolean;
+}
+
 

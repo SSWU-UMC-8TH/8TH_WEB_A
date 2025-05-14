@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom";
 import useGetLpDetail from "../hooks/queries/useGetLpDetail";
+
 import { Heart } from "lucide-react";
+import { MoreVertical, Trash2, Pencil } from "lucide-react";
+
 import { useAuth } from "../context/AuthContext";
 import useGetMyInfo from "../hooks/queries/useGetMyInfo";
 import usePostLike from "../hooks/mutations/usePostLike";
@@ -11,15 +14,27 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import CommentSkeletonList from "../components/\bComment/CommentSkeletonList";
 
+import usePostComment from "../hooks/mutations/usePostComment";
+import useDeleteComment from "../hooks/mutations/useDeleteComment";
+import useUpdateComment from "../hooks/mutations/useUpdateCommet";
+import CommentItem from "../components/\bComment/CommetItem";
+
 const LpDetailPage = () => {
   const [sortOrder, setSortOrder] = useState(PAGINATION_ORDER.desc);
   const { lpId } = useParams();
+  const lpIdNumber = Number(lpId);
   const { accessToken } = useAuth();
   const { data: lp, isPending, isError } = useGetLpDetail({ lpId: Number(lpId) });
+  const [commentInput, setCommentInput] = useState("");
+
+
+  const { mutate: deleteComment } = useDeleteComment(lpIdNumber);
+const { mutate: updateComment } = useUpdateComment(lpIdNumber);
 
   const { data: me } = useGetMyInfo(accessToken);
   const { mutate: likeMutate, mutateAsync } = usePostLike();
   const { mutate: dislikeMutate } = useDeleteLike();
+  const { mutate: postCommentMutate, isPending: isPosting } = usePostComment();
   
   const isLiked = lp?.data.likes
     .map((like) => like.userId)
@@ -34,12 +49,12 @@ const LpDetailPage = () => {
     dislikeMutate({ lpId: Number(lpId) });
   }
 
-  
   const {
     data: commentsData,
     isLoading,
     hasNextPage,
     fetchNextPage,
+    refetch,
   } = useGetInfiniteCommentList(Number(lpId), 10, sortOrder);
 
   const { ref, inView } = useInView();
@@ -59,6 +74,29 @@ const LpDetailPage = () => {
       </>
     );
   }
+
+  const handlePostComment = () => {
+    if (!commentInput.trim()) return;
+
+    postCommentMutate(
+      {
+        lpId: Number(lpId),
+        content: commentInput.trim(),
+        order: sortOrder,
+      },
+      {
+        onSuccess: () => {
+          setCommentInput(""); // 입력창 비우기
+          refetch();
+        },
+        onError: (error: any) => {
+          console.error("댓글 작성 에러:", error);
+          alert(error?.response?.data?.message || "댓글 작성에 실패했습니다.");
+        },
+      }
+    );
+  };
+
 
   return (
     <div className="flex justify-center items-start min-h-screen bg-gray-100 py-10 px-4">
@@ -85,11 +123,16 @@ const LpDetailPage = () => {
         <h2 className="text-xl font-bold mb-1">댓글</h2>
         <div className="mb-2 flex items-start gap-2">
           <textarea
-            className="flex-1 p-2 h-10 text-sm text-black rounded-md border border-gray-300 focus:outline-none placeholder-gray-400 resize-none"
+            className="flex-1 p-2 h-10 text-sm text-white rounded-md border border-gray-300 focus:outline-none placeholder-gray-400 resize-none "
             placeholder="댓글을 작성해주세요..."
             rows={1}
-          ></textarea>
-          <button className="px-4 h-10 bg-white text-black rounded-md border border-gray-300 hover:bg-gray-100 text-sm">
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+          />
+          <button
+            onClick={handlePostComment}
+            disabled={isPosting}
+            className="px-4 h-10 bg-white text-black rounded-md border border-gray-300 hover:bg-gray-100 text-sm">
             작성
           </button>
         </div>
@@ -124,15 +167,19 @@ const LpDetailPage = () => {
             ) : (
               commentsData?.pages.map((page, pageIndex) =>
                 page.data.data.map((comment, idx) => (
-                  <div key={`${pageIndex}-${idx}`} className="mb-6 border-b border-gray-700 pb-4">
-                    <p className="font-semibold">{comment.author.name}</p>
-                    <p className="text-gray-300">{comment.content}</p>
-                  </div>
+                  <CommentItem
+                    key={`${pageIndex}-${idx}`}
+                    comment={comment}
+                    lpId={lpIdNumber}
+                    myId={me?.data.id}
+                    refetch={refetch}
+                  />
                 ))
               )
 
             )}
             <div ref={ref} style={{ height: "20px" }} />
+
           </div>
         </div>
       </div>

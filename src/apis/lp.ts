@@ -1,5 +1,5 @@
 import { PaginationDto } from "../types/common";
-import { GetCommentParams, RequestLpDto, ResponseCommentListDto, ResponseLikeLpDto, ResponseLpDto, ResponseLPListDto } from "../types/lp";
+import { CreateLpDto, GetCommentParams, RequestLpDto, ResponseCommentListDto, ResponseLikeLpDto, ResponseLpDto, ResponseLPListDto } from "../types/lp";
 import { axiosInstance } from "./axios";
 
 export const getLpList = async (paginationDto: PaginationDto):Promise<ResponseLPListDto> => {
@@ -39,4 +39,19 @@ export const getComments = async ({
   return data;
 };
 
+export const postLp = async (lpData: CreateLpDto): Promise<void> => {
+  const res = await axiosInstance.post("/v1/lps", lpData);
+  return res.data;
+};
 
+export const uploadImageToServer = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await axiosInstance.post("/v1/uploads", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data.data.imageUrl;
+}

@@ -20,7 +20,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   
         setData(response);
       };
-  
+      
       getData();
     }, [])
   
