@@ -61,3 +61,13 @@ export const patchUser = async ( formData:FormData | RequestUserDto) => {
   const { data } = await axiosInstance.patch("/v1/users", formData,);
   return data;
 }
+
+export const patchLp = (lpId: number, patchData: CreateLpDto) => {
+  return axiosInstance.patch(`/lps/${lpId}`, patchData);
+};
+
+export const deleteLp = async ({ lpId }: RequestLpDto): Promise<ResponseLpDto> => {
+  const { data } = await axiosInstance.delete(`/v1/lps/${lpId}`)
+
+  return data;
+}

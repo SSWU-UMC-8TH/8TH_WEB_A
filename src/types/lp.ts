@@ -72,8 +72,8 @@ export type CreateLpDto = {
   title: string;
   content: string;
   thumbnail: string;
-  tags: string[];
-  published: boolean;
+  tags?: string[];
+  published?: boolean;
 }
 
 

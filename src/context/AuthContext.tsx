@@ -66,6 +66,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       setRefreshToken(null);
 
       alert("Logout successful");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout failed", error);
       alert("Logout failed. Please try again.");

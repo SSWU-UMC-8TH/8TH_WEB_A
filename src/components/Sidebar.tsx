@@ -5,9 +5,10 @@ import { X } from "lucide-react";
 type SidebarProps = {
   isOpen: boolean;
   onClose: () => void;
+  onWithdrawClick: () => void;
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onWithdrawClick }) => {
   return (
     <div
       className={`fixed top-0 left-0 h-full w-45 bg-black shadow-lg transform transition-transform duration-300 z-10 ${
@@ -34,6 +35,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         🔍 
       </Link>
+      </div>
+
+      <div className="px-6 mt-auto mb-4">
+        <button
+          onClick={onWithdrawClick}
+          className="text-red-600 border border-red-600 px-4 py-2 rounded-xl hover:bg-red-50 w-full"
+        >
+          탈퇴하기
+        </button>
       </div>
     </div>
   );

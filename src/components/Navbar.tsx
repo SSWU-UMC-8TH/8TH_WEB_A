@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ResponseMyInfoDto } from "../types/auts";
 import { getMyInfo } from "../apis/auts";
+import { useLogout } from "../hooks/mutations/useLogout";
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -10,23 +11,35 @@ type NavbarProps = {
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const navigate = useNavigate();
-  const { accessToken, logout } = useAuth();
-  const [data, setData] = useState<ResponseMyInfoDto>([]);
+  const { accessToken } = useAuth();
+  const [data, setData] = useState<ResponseMyInfoDto | null>(null);
+
+  const { mutate: logoutMutation } = useLogout();
   
     useEffect(() => {
       const getData = async () => {
-        const response = await getMyInfo();
-        console.log(response);
-  
-        setData(response);
-      };
+        try {
+      if (!accessToken) return; // ✅ accessToken 없으면 API 호출 안 함
+      const response = await getMyInfo();
+      console.log(response);
+      setData(response);
+    } catch (error) {
+      console.error('getMyInfo 실패:', error);
+    }
+  };
       
       getData();
-    }, [])
+    }, [accessToken])
   
   const handleLogout = async () => {
-    await logout();
-    navigate("/");
+    try {
+      await logoutMutation(); 
+      setData(null); 
+      navigate("/");
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+      alert("로그아웃 중 문제가 발생했습니다.");
+    }
   }
 
   return (
@@ -67,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
           {accessToken && (  // accessToken이 있으면 로그아웃 보여줌
             <div className="flex justify-between gap-5">
               <div className="text-white text-base mt-3 font-medium whitespace-nowrap">
-                {data.data?.name}님, 반갑습니다.
+                {data?.data?.name}님, 반갑습니다.
               </div>
           <button
             className="w-full bg-black text-white py-3 rounded-md font-medium hover:bg-blue-700 transition-colors cursor-pointer"
