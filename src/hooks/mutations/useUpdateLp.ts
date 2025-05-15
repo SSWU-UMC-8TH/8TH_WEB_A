@@ -1,4 +1,3 @@
-// ✅ useUpdateLp.ts 수정
 import { useMutation } from "@tanstack/react-query";
 import { patchLp } from "../../apis/lp";
 import { queryClient } from "../../App";
