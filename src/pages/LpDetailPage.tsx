@@ -167,15 +167,18 @@ const LpDetailPage = () => {
                 alt={lp?.data.title}
               />
               <p className="mb-4 text-gray-300 whitespace-pre-wrap">{lp?.data.content}</p>
-            </>
+            </> 
           )}
-          <button onClick={isLiked ? handleDisLikeLp : handleLikeLp}>
-            <Heart
+            <div className="flex items-center gap-2">
+            <button onClick={isLiked ? handleDisLikeLp : handleLikeLp}>
+              <Heart
               size={28}
               color={isLiked ? "red" : "white"}
               fill={isLiked ? "red" : "transparent"}
-            />
-          </button>
+              /> 
+            </button>
+            <span className="text-lg">{lp?.data.likes.length ?? 0}</span>
+            </div>
         </div>
 
         {/* 댓글 입력 */}
