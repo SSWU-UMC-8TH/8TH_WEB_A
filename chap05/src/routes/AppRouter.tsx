@@ -9,7 +9,7 @@ import { GoogleLoginRedirectPage } from '../pages/GoogleLoginRedirectPage';
 import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../pages/MyPage';
 import LpDetailPage from '../pages/LpDetailPage';
-import LpEditPage from '../pages/LPEditPage'; // ✅ 수정 페이지 import 추가
+import LpEditPage from '../pages/LpEditPage'; // ✅ 수정 페이지 import 추가
 
 export const router = createBrowserRouter([
   {

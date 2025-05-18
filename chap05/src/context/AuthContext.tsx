@@ -14,13 +14,17 @@ interface AuthContextType {
   user: ResponseMyInfoDto | null;
   login: (data: RequestSigninDto) => Promise<void>;
   logout: () => Promise<void>;
+  setUser: (user: ResponseMyInfoDto) => void; 
 }
 
 export const AuthContext = createContext<AuthContextType>({
   accessToken: null,
   user: null,
-  login: async () => {},
-  logout: async () => {},
+  login: async () => { },
+  logout: async () => { },
+  setUser: function (user: ResponseMyInfoDto): void {
+    throw new Error('Function not implemented.');
+  }
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -65,7 +69,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, login, logout, user }}>
+    <AuthContext.Provider value={{ accessToken, login, logout, user, setUser }}>
       {children}
     </AuthContext.Provider>
   );

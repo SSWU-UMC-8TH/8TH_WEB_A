@@ -11,7 +11,7 @@ import axios from "axios";
 const MyPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { logout } = useAuth();
+  const { logout, setUser } = useAuth(); // ✅ setUser 가져오기
   const [data, setData] = useState<ResponseMyInfoDto | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState("");
@@ -59,10 +59,11 @@ const MyPage = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      return res.data;
+      return res.data.data; // 유저 데이터 반환
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+    onSuccess: (updatedUser) => {
+      setUser(updatedUser); // ✅ Optimistic update
+      setData(updatedUser); // 로컬 상태도 업데이트
       setEditMode(false);
     },
   });

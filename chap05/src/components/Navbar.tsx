@@ -1,9 +1,6 @@
 // src/components/Navbar.tsx
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
-import { ResponseMyInfoDto } from "../types/authTypes";
-import { getMyInfo } from "../apis/authApi";
 import { useMutation } from "@tanstack/react-query";
 
 type NavbarProps = {
@@ -12,22 +9,7 @@ type NavbarProps = {
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const navigate = useNavigate();
-  const { accessToken, logout } = useAuth();
-  const [data, setData] = useState<ResponseMyInfoDto>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!accessToken) return;
-      try {
-        const response = await getMyInfo();
-        setData(response);
-      } catch (err) {
-        console.error("🔴 유저 정보 가져오기 실패:", err);
-        setData(undefined);
-      }
-    };
-    fetchData();
-  }, [accessToken]);
+  const { accessToken, logout, user } = useAuth(); // ✅ user 가져오기
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -78,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
             ) : (
               <>
                 <span className="text-sm text-gray-300 font-medium whitespace-nowrap hidden sm:inline">
-                  {data?.name ?? "사용자"}님 반갑습니다
+                  {user?.name ?? "사용자"}님 반갑습니다
                 </span>
                 <button
                   onClick={() => logoutMutation.mutate()}

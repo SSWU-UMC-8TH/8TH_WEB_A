@@ -38,7 +38,7 @@ const LpEditPage = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lp", id] });
+      queryClient.invalidateQueries({ queryKey: ["lps", id] });
       navigate(`/lp/${id}`);
     },
   });

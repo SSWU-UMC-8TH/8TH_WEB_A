@@ -40,7 +40,7 @@ const LpDetailPage = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lp", id] });
+      queryClient.invalidateQueries({ queryKey: ["lps", id] });
     },
   });
 
