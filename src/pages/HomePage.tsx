@@ -4,11 +4,13 @@ import useGetInfiniteLpList from "../hooks/queries/useGetInfiniteLpList";
 import { useInView } from "react-intersection-observer";
 import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
+import useDebounce from "../hooks/useDebounce";
+import { SEARCH_DEBOUNCE_DELAY } from "../constants/delay";
 
 export const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
-
+  const debouncedValue = useDebounce(search, SEARCH_DEBOUNCE_DELAY);
   // const { data, isPending, isError } = useGetLpList({
   //   search,
   //   order,
@@ -22,7 +24,7 @@ export const HomePage = () => {
     isPending,
     fetchNextPage,
     isError
-  } = useGetInfiniteLpList(1, search, order)
+  } = useGetInfiniteLpList(10, debouncedValue ?? "", order)
 
   // ref :  특정한 HTML 요소를 감시할 수 있다
   // inView : 감시하고 있는 요소가 화면에 보이면 true, 아니면 false
@@ -44,6 +46,12 @@ export const HomePage = () => {
     <div className="p-8 bg-white min-h-screen">
       {/* 정렬 버튼 */}
       <div className="flex justify-end mb-4 space-x-2">
+        <input
+          className={"border p-2 rounded-sm"}
+          placeholder={"검색어를 입력하세요."}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <button
           className={`px-4 py-1 rounded ${
             order === "asc" ? "bg-white text-black" : "bg-gray-700 text-white"
