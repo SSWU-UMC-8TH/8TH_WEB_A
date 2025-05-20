@@ -6,16 +6,12 @@ import LpCard from "../components/LpCard/LpCard";
 import LpCardSkeletonList from "../components/LpCard/LpCardSkeletonList";
 import useDebounce from "../hooks/useDebounce";
 import { SEARCH_DEBOUNCE_DELAY } from "../constants/delay";
+import useThrottle from "../hooks/useThrottle";
 
 export const HomePage = () => {
   const [search, setSearch] = useState("");
   const [order, setOrder] = useState<PAGINATION_ORDER>(PAGINATION_ORDER.desc);
   const debouncedValue = useDebounce(search, SEARCH_DEBOUNCE_DELAY);
-  // const { data, isPending, isError } = useGetLpList({
-  //   search,
-  //   order,
-  //   limit: 50,
-  // });
 
   const {
     data: lps,
@@ -33,10 +29,19 @@ export const HomePage = () => {
   })
 
   useEffect(() => {
-    if (inView) {
+  if (inView) {
+    console.log("🔥 inView: true");
+  }
+}, [inView]);
+
+  const throttledInView = useThrottle(inView, 8000);
+
+  useEffect(() => {
+    if (throttledInView) {
+      console.log("✅ throttledInView: true (fetch 호출)");
       !isFetching && hasNextPage && fetchNextPage();
     }
-  },[inView, isFetching, hasNextPage, fetchNextPage])
+  },[throttledInView, isFetching, hasNextPage, fetchNextPage])
 
   if (isError) return <div className="mt-20 text-white">Error...</div>;
 

@@ -11,7 +11,6 @@ function useUpdateLp() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY.lps, variables.lpId],
-        exact: true,
       });
     },
   });
