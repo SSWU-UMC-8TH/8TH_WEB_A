@@ -10,6 +10,7 @@ import ProtectedRoute from './ProtectedRoute';
 import MyPage from '../pages/MyPage';
 import LpDetailPage from '../pages/LpDetailPage';
 import LpEditPage from '../pages/LpEditPage'; // ✅ 수정 페이지 import 추가
+import Search from '../pages/Search';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
+      { path: 'search', element: <Search /> },
       { path: 'v1/auth/google/callback', element: <GoogleLoginRedirectPage /> },
       {
         path: 'my',
