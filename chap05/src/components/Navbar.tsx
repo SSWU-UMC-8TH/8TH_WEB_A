@@ -2,6 +2,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
+import { ShoppingCart } from "lucide-react";
 
 type NavbarProps = {
   toggleSidebar: () => void;
@@ -9,7 +10,7 @@ type NavbarProps = {
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const navigate = useNavigate();
-  const { accessToken, logout, user } = useAuth(); // ✅ user 가져오기
+  const { accessToken, logout, user } = useAuth();
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -20,11 +21,14 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     },
   });
 
+  // TODO: Redux or Context 에서 실제 cartCount 를 가져오세요.
+  const cartCount = 0;
+
   return (
-    <nav className="bg-black dark:bg-gray-900 fixed top-0 left-0 w-full z-30 shadow-md">
+    <nav className="bg-black fixed top-0 left-0 w-full z-30 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between">
-          {/* 왼쪽: 로고 & 메뉴 버튼 */}
+          {/* 왼쪽: 햄버거, 로고 */}
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSidebar}
@@ -40,8 +44,27 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
             </Link>
           </div>
 
-          {/* 오른쪽: 인증 버튼 or 유저 정보 */}
+          {/* 오른쪽: 검색, 장바구니, 인증 */}
           <div className="flex items-center gap-4">
+            <Link
+              to="/search"
+              className="text-white hover:text-gray-300 transition"
+            >
+              🔍
+            </Link>
+
+            <Link
+              to="/cart"
+              className="relative text-white hover:text-gray-300 transition"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-pink-500 text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
             {!accessToken ? (
               <>
                 <Link
@@ -59,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
               </>
             ) : (
               <>
-                <span className="text-sm text-gray-300 font-medium whitespace-nowrap hidden sm:inline">
+                <span className="text-sm text-gray-300 font-medium hidden sm:inline">
                   {user?.name ?? "사용자"}님 반갑습니다
                 </span>
                 <button
@@ -74,7 +97,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
         </div>
       </div>
     </nav>
-  );
-};
-
+);
+}
 export default Navbar;

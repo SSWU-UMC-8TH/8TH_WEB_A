@@ -13,10 +13,10 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router}>
-        <AuthProvider>
-        </AuthProvider>
-      </RouterProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
