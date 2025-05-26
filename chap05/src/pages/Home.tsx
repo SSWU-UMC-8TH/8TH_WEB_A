@@ -69,7 +69,7 @@ export const HomePage = () => {
               alt={typeof lp.title === "string" ? lp.title : String(lp.title)}
               className="w-full h-48 object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end backdrop-blur-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent -0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end backdrop-blur-sm">
               <h3 className="text-lg font-semibold truncate text-white drop-shadow-md">
                 {lp.title}
               </h3>
