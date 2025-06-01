@@ -12,7 +12,7 @@ const PriceBox = () => {
   };
 
   return (
-    <div className="p-12 flex justify-between">
+    <div className="p-12">
       <button onClick={handleInitializeCart} className="border p-4 rounded-md cursor-pointer">전체 삭제</button>
       <div>총 금액: {total}원</div>
       {isModalOpen && <ConfirmModal />}
